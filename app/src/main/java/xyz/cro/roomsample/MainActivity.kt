@@ -16,11 +16,24 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // ADD USER
         buttonAddUser.setOnClickListener {
-            val user: User = User(1, "Juyoung", "Lee")
+            val user = User(1, "Juyoung", "Lee")
 
             appExecutor.diskIO.execute {
                 dao.add(user)
+
+                appExecutor.mainThread.execute { getUserList() }
+            }
+        }
+
+        // DELETE USER
+        buttonDeleteUser.setOnClickListener {
+            appExecutor.diskIO.execute {
+                dao.getUser(1)?.let {
+                    Log.d("ROOM-DATABASE", "find user: $it")
+                    dao.delete(it)
+                }
 
                 appExecutor.mainThread.execute { getUserList() }
             }
